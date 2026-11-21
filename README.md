@@ -8,10 +8,17 @@ A sleek TUI remote control for Roku TVs. Control your TV from the terminal.
 pip install git+https://github.com/watanabekyonosuke/roku-remote.git
 ```
 
-Or with [uv](https://docs.astral.sh/uv/):
+Or run it directly with [uv](https://docs.astral.sh/uv/) (no install needed):
 
 ```
 uvx --from git+https://github.com/watanabekyonosuke/roku-remote.git roku-remote
+```
+
+To install permanently with uv:
+
+```
+uv tool install git+https://github.com/watanabekyonosuke/roku-remote.git
+roku-remote
 ```
 
 ## Usage
