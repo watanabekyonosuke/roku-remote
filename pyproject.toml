@@ -1,0 +1,17 @@
+[project]
+name = "roku-remote"
+version = "0.1.0"
+description = "A sleek TUI remote control for Roku TVs"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.11"
+dependencies = [
+    "textual>=1.0.0",
+]
+
+[project.scripts]
+roku-remote = "roku_remote.cli:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
