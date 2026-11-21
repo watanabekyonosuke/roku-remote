@@ -16,10 +16,10 @@ uvx roku-remote
 
 ## Usage
 
-```
-roku-remote              # auto-discovers Roku TVs on your network
+```x
+roku-remote                      # auto-discovers Roku TVs on your network
 roku-remote --ip 192.168.1.100   # connect to a specific IP
-roku-remote --scan       # list all Roku devices on the network
+roku-remote --scan               # list all Roku devices on the network
 ```
 
 ## Keyboard Shortcuts
