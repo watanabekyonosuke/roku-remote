@@ -23,10 +23,11 @@ roku-remote
 
 ## Usage
 
-```x
+```bash
 roku-remote                      # auto-discovers Roku TVs on your network
 roku-remote --ip 192.168.1.100   # connect to a specific IP
 roku-remote --scan               # list all Roku devices on the network
+roku-remote --forget             # clear cached device and re-scan
 ```
 
 ## Keyboard Shortcuts
@@ -52,7 +53,7 @@ Click any app in the right panel to launch it. All installed apps and HDMI input
 
 ## How It Works
 
-Uses Roku's [External Control Protocol (ECP)](https://developer.roku.com/docs/developer-program/debugging/external-control-api.md) -- a local HTTP API that Roku TVs expose on port 8060. Device discovery uses SSDP (the same protocol your phone's Roku app uses).
+Uses Roku's [External Control Protocol (ECP)](https://developer.roku.com/docs/developer-program/debugging/external-control-api.md) -- a local HTTP API that Roku TVs expose on port 8060. Device discovery uses SSDP (the same protocol your phone's Roku app uses). Once a device is found, its IP is cached to `~/.config/roku-remote/device.json` so subsequent launches skip the scan.
 
 No accounts, no cloud, no tracking. Everything stays on your local network.
 
