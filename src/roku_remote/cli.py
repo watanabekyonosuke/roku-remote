@@ -1,11 +1,30 @@
 """CLI entry point for roku-remote."""
 
 import argparse
+import json
 import sys
+from pathlib import Path
 
 from roku_remote.discovery import discover_roku, get_device_info, get_installed_apps, get_input_names
 from roku_remote.ecp import RokuClient
 from roku_remote.app import RokuRemote
+
+CACHE_DIR = Path.home() / ".config" / "roku-remote"
+CACHE_FILE = CACHE_DIR / "device.json"
+
+
+def save_device(ip: str, name: str) -> None:
+    CACHE_DIR.mkdir(parents=True, exist_ok=True)
+    CACHE_FILE.write_text(json.dumps({"ip": ip, "name": name}))
+
+
+def load_device() -> dict | None:
+    if CACHE_FILE.exists():
+        try:
+            return json.loads(CACHE_FILE.read_text())
+        except (json.JSONDecodeError, KeyError):
+            return None
+    return None
 
 
 def main() -> None:
@@ -22,7 +41,21 @@ def main() -> None:
         action="store_true",
         help="Scan for Roku devices and exit",
     )
+    parser.add_argument(
+        "--forget",
+        action="store_true",
+        help="Clear cached device and re-scan",
+    )
     args = parser.parse_args()
+
+    if args.forget:
+        if CACHE_FILE.exists():
+            CACHE_FILE.unlink()
+            print("Cached device cleared.")
+        else:
+            print("No cached device.")
+        if not args.scan:
+            sys.exit(0)
 
     if args.scan:
         print("Scanning for Roku devices...")
@@ -36,6 +69,20 @@ def main() -> None:
 
     ip = args.ip
     device_name = "Roku"
+
+    # Try cached device if no IP specified
+    if not ip:
+        cached = load_device()
+        if cached:
+            ip = cached["ip"]
+            device_name = cached["name"]
+            info = get_device_info(ip)
+            if info:
+                device_name = info["name"]
+                print(f"Using cached device: {device_name} ({ip})")
+            else:
+                print(f"Cached device {ip} unreachable, scanning...")
+                ip = None
 
     if not ip:
         print("Scanning for Roku devices...")
@@ -62,12 +109,16 @@ def main() -> None:
                 except ValueError:
                     pass
                 print("Invalid choice.")
-    else:
+
+        save_device(ip, device_name)
+    elif not load_device():
+        # Cache manually specified IP too
         info = get_device_info(ip)
         if info:
             device_name = info["name"]
         else:
             print(f"Warning: Could not reach {ip}")
+        save_device(ip, device_name)
 
     client = RokuClient(ip)
     apps = get_installed_apps(ip)
