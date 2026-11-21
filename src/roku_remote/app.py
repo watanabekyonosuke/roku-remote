@@ -5,6 +5,7 @@ from textual.app import App, ComposeResult
 from textual.binding import Binding
 from textual.containers import Container, Horizontal, Vertical, Grid
 from textual.css.query import NoMatches
+from textual.events import Key
 from textual.screen import ModalScreen
 from textual.widgets import Button, Footer, Header, Input, Label, Static
 
@@ -231,13 +232,11 @@ class RokuRemote(App):
     CSS = CSS
     BINDINGS = [
         Binding("q", "quit", "Quit"),
-        Binding("up", "press('Up')", "Up", show=False),
-        Binding("down", "press('Down')", "Down", show=False),
-        Binding("left", "press('Left')", "Left", show=False),
-        Binding("right", "press('Right')", "Right", show=False),
-        Binding("enter", "press('Select')", "OK", show=False),
-        Binding("escape", "press('Back')", "Back", show=False),
-        Binding("space", "press('Play')", "Play", show=False),
+        Binding("up", "nav('Up')", "Up", show=False),
+        Binding("down", "nav('Down')", "Down", show=False),
+        Binding("left", "nav('Left')", "Left", show=False),
+        Binding("right", "nav('Right')", "Right", show=False),
+        Binding("space", "press('Play')", "Play"),
         Binding("h", "press('Home')", "Home"),
         Binding("b", "press('Back')", "Back"),
         Binding("r", "press('Rev')", "Rew"),
@@ -327,6 +326,21 @@ class RokuRemote(App):
             self.query_one("#status-bar", Label).update(status)
         except NoMatches:
             pass
+
+    def on_key(self, event: Key) -> None:
+        """Intercept Enter and Escape before Textual consumes them."""
+        if event.key == "enter":
+            event.prevent_default()
+            event.stop()
+            self._fire("Select")
+        elif event.key == "escape":
+            event.prevent_default()
+            event.stop()
+            self._fire("Back")
+
+    def action_nav(self, key: str) -> None:
+        """Send d-pad key to TV."""
+        self._fire(key)
 
     def action_press(self, key: str) -> None:
         self._fire(key)
